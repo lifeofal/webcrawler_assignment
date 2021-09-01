@@ -1,6 +1,7 @@
 import scrapy
 
-class KsuSpider(scrapy.Spider):
+
+class ksuSpider(scrapy.Spider):
     name = "KSUSpider"
 
     def start_requests(self):
@@ -14,17 +15,14 @@ class KsuSpider(scrapy.Spider):
 
     def parse(self, response):
 
-        #create a way to scrape webpages, store and catigoirze which pages have email addresses in raw format.
+        # create a way to scrape webpages, store and catigoirze which pages have email addresses in raw format.
 
-        #link extractor can only use links with 'kennesaw.edu' in the domain
-        #no dupe links
+        # link extractor can only use links with 'kennesaw.edu' in the domain
+        # no dupe links
 
-        for email in response.xpath('//a[contains(@href,\'@\')'):
-            yield{
-                #'email': email.xpath('//*[contains(text(), \'@\')]').get()
+        for email in response.xpath('//a'):
+            yield {
+                # 'email': email.xpath('//*[contains(text(), \'@\')]').get()
                 'Email': email.xpath('//a[starts-with(@href, \'mailto\')]/text()').get()
                 #
             }
-
-
-
