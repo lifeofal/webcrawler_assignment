@@ -20,35 +20,44 @@ class ksuSpider(scrapy.Spider):
     )
 
     start_urls = [
-        'https://www.kennesaw.edu'
+        'https://www.kennesaw.edu',
+        'https://ccse.kennesaw.edu/fye/staff.php',
     ]
+
 
     def parse(self, response):
 
         url = response.request.url
+
         page = response.body
         title = response.css('title::text').get()
-        pageid = hashlib.md5(url.encode())
+        pageId = hashlib.md5(url.encode())
 
         entry = dict.fromkeys(['pageid', 'url', 'title', 'body', 'emails'])
 
         entry['title'] = title
         entry['url'] = url
-        entry['pageid'] = pageid.hexdigest()[:5]
-        entry['emails'] = response.css('a[href ^= \"mailto\"]::text').getall(),
+        entry['pageid'] = pageId.hexdigest()[:5]
+        #entry['emails'] = response.css('a[href ^= \"mailto\"]::text').getall(),
         soup = BeautifulSoup(page, 'html.parser')
         body = soup.get_text(separator=' ', strip='true')
         entry['body'] = body
 
-        filename = f'{title}.html'
-        with open(filename, 'w') as f:
-            f.write(body)
+
+
+
+        # filename = f'{title}.html'
+        # with open(filename, 'w') as f:
+        #     f.write(body)
 
         for info in response.css('div.site_wrapper'):
-            entry['emails'] = info.css('a[href ^= \"mailto\"]::text').getall(),
-            yield entry
+            entry['emails'] = info.css('a[href ^= \"mailto\"]::text').getall()
+        yield entry
 
-        next_page = response.css('div#gold_bar a::attr(href)').get()
-        if next_page is not None:
-            next_page = response.urljoin(next_page)
-            yield scrapy.Request(next_page, callback=self.parse)
+
+
+        # links = response.css('div.site_wrapper a[href ^= \"https\"]::attr(href)').extract()
+        # for link in links:
+        #     if link is not None:
+        #         link = response.urljoin(link)
+        #         yield scrapy.Request(link, callback=self.parse)
