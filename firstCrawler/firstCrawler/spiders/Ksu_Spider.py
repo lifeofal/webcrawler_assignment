@@ -22,6 +22,8 @@ class ksuSpider(scrapy.Spider):
     start_urls = [
         'https://www.kennesaw.edu',
         'https://ccse.kennesaw.edu/fye/staff.php',
+        'https://ccse.kennesaw.edu/cs/',
+        'https://ccse.kennesaw.edu/cs/about/faculty-staff.php',
     ]
 
 
@@ -41,7 +43,7 @@ class ksuSpider(scrapy.Spider):
         #entry['emails'] = response.css('a[href ^= \"mailto\"]::text').getall(),
         soup = BeautifulSoup(page, 'html.parser')
         body = soup.get_text(separator=' ', strip='true')
-        entry['body'] = body
+        entry['body'] = body.replace("\n", "").replace("\t", "")
 
 
 
@@ -56,8 +58,8 @@ class ksuSpider(scrapy.Spider):
 
 
 
-        # links = response.css('div.site_wrapper a[href ^= \"https\"]::attr(href)').extract()
-        # for link in links:
-        #     if link is not None:
-        #         link = response.urljoin(link)
-        #         yield scrapy.Request(link, callback=self.parse)
+        links = response.css('div.site_wrapper a[href ^= \"https\"]::attr(href)').extract()
+        for link in links:
+            if link is not None:
+                link = response.urljoin(link)
+                yield scrapy.Request(link, callback=self.parse)
